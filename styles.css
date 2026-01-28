@@ -65,10 +65,15 @@ header {
   letter-spacing: -0.5px;
 }
 
-.version {
+.header-buttons {
   position: absolute;
   top: 0;
   right: 0;
+  display: flex;
+  gap: 8px;
+}
+
+.version, .discord-btn {
   font-size: 11px;
   font-weight: 600;
   color: var(--text-dim);
@@ -78,12 +83,21 @@ header {
   border: 1px solid rgba(255,255,255,0.05);
   cursor: pointer;
   transition: var(--transition);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.version:hover {
+.version:hover, .discord-btn:hover {
   background: var(--surface-light);
   border-color: var(--primary);
   color: var(--primary);
+}
+
+.discord-btn img {
+  width: 16px;
+  height: 16px;
 }
 
 .title-section h1 span {
