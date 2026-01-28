@@ -16,6 +16,7 @@
       <div class="header-content">
         <div class="title-section">
           <h1>Partvisions<span> List of Good GD Levels</span></h1>
+          <div class="version" id="versionBtn">v1.0</div>
         </div>
         <div class="search-section">
           <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -55,8 +56,20 @@
           <button id="clearFilters" class="clear-filters-btn">Clear Filters</button>
         </div>
         <div id="activeFilters" class="active-filters"></div>
+        <button id="shareBtn" class="share-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          Share List
+        </button>
       </div>
     </header>
+
+    <div id="toast" class="toast"></div>
 
     <div class="cards-container">
       <div class="category-card" data-category="unrated">
@@ -122,11 +135,20 @@
           </div>
         </div>
 
+        <div id="starRatingField" class="input-group" style="display: none;">
+          <label>Star Rating</label>
+          <select id="starRating">
+            <option value="">Select stars</option>
+          </select>
+        </div>
+
         <div id="ratingField" class="input-group">
           <label>Decoration Rating</label>
           <select id="rating">
             <option value="none">Standard</option>
+            <option value="rated">Rated</option>
             <option value="featured">Featured</option>
+            <option value="epic">Epic</option>
             <option value="legendary">Legendary</option>
             <option value="mythic">Mythic</option>
           </select>
@@ -139,9 +161,27 @@
 
         <div class="modal-actions">
           <button type="button" id="cancelBtn" class="btn-secondary">Discard</button>
-          <button type="submit" class="btn-primary">Add Level</button>
+          <button type="submit" id="submitBtn" class="btn-primary">Add Level</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div id="changelogModal" class="modal">
+    <div class="modal-content changelog-modal">
+      <div class="modal-header">
+        <h2>Changelog</h2>
+        <button type="button" id="closeChangelog" class="close-btn">×</button>
+      </div>
+      <div class="changelog-content">
+        <div class="changelog-version">
+          <div class="version-number">v1.0</div>
+          <div class="changelog-items">
+            <div class="changelog-item">Added Graphical Changelog and Version</div>
+            <div class="changelog-item">Selectable Stars</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

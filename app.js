@@ -4,10 +4,12 @@ class LevelManager {
     this.searchQuery = '';
     this.difficultyFilter = 'all';
     this.sortFilter = 'recent';
+    this.editingId = null;
     this.init();
   }
 
   init() {
+    this.checkSharedData();
     this.setupEventListeners();
     this.renderLevels();
     this.updateDifficultyOptions();
@@ -15,12 +17,15 @@ class LevelManager {
 
   setupEventListeners() {
     document.getElementById('addBtn').addEventListener('click', () => {
-      document.getElementById('modal').classList.add('active');
+      this.openModal();
     });
 
     const closeModal = () => {
       document.getElementById('modal').classList.remove('active');
       document.getElementById('levelForm').reset();
+      this.editingId = null;
+      document.querySelector('.modal-header h2').textContent = 'Add New Level';
+      document.getElementById('submitBtn').textContent = 'Add Level';
     };
 
     document.getElementById('cancelBtn').addEventListener('click', closeModal);
@@ -33,6 +38,10 @@ class LevelManager {
 
     document.getElementById('category').addEventListener('change', () => {
       this.updateDifficultyOptions();
+    });
+
+    document.getElementById('difficulty').addEventListener('change', () => {
+      this.updateStarRatingOptions();
     });
 
     document.getElementById('searchBar').addEventListener('input', (e) => {
@@ -68,6 +77,75 @@ class LevelManager {
     document.getElementById('modal').addEventListener('click', (e) => {
       if (e.target.id === 'modal') closeModal();
     });
+
+    // Share button
+    document.getElementById('shareBtn').addEventListener('click', () => {
+      this.shareList();
+    });
+
+    // Version/Changelog
+    document.getElementById('versionBtn').addEventListener('click', () => {
+      document.getElementById('changelogModal').classList.add('active');
+    });
+
+    document.getElementById('closeChangelog').addEventListener('click', () => {
+      document.getElementById('changelogModal').classList.remove('active');
+    });
+
+    document.getElementById('changelogModal').addEventListener('click', (e) => {
+      if (e.target.id === 'changelogModal') {
+        document.getElementById('changelogModal').classList.remove('active');
+      }
+    });
+  }
+
+  checkSharedData() {
+    const hash = window.location.hash.slice(1);
+    if (!hash) return;
+
+    try {
+      const decoded = atob(hash);
+      const sharedLevels = JSON.parse(decoded);
+      
+      if (Array.isArray(sharedLevels) && sharedLevels.length > 0) {
+        const confirmImport = confirm(`Import ${sharedLevels.length} shared levels? This will replace your current list.`);
+        if (confirmImport) {
+          this.levels = sharedLevels;
+          this.saveLevels();
+          this.renderLevels();
+          this.showToast('Levels imported successfully!');
+        }
+        window.location.hash = '';
+      }
+    } catch (e) {
+      console.error('Invalid shared data');
+    }
+  }
+
+  shareList() {
+    if (this.levels.length === 0) {
+      this.showToast('No levels to share!');
+      return;
+    }
+
+    const encoded = btoa(JSON.stringify(this.levels));
+    const shareUrl = `${window.location.origin}${window.location.pathname}#${encoded}`;
+    
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      this.showToast('Share link copied to clipboard!');
+    }).catch(() => {
+      this.showToast('Failed to copy link');
+    });
+  }
+
+  showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
   }
 
   updateDifficultyOptions() {
@@ -98,6 +176,62 @@ class LevelManager {
     difficultySelect.innerHTML = options
       .map(opt => `<option value="${opt.value}">${opt.label}</option>`)
       .join('');
+    
+    this.updateStarRatingOptions();
+  }
+
+  updateStarRatingOptions() {
+    const category = document.getElementById('category').value;
+    const difficulty = document.getElementById('difficulty').value;
+    const starRatingField = document.getElementById('starRatingField');
+    const starRatingSelect = document.getElementById('starRating');
+    
+    if (category === 'demon' || category === 'unrated') {
+      starRatingField.style.display = 'none';
+      return;
+    }
+
+    const starRanges = {
+      'insane': ['8', '9'],
+      'harder': ['6', '7'],
+      'hard': ['4', '5'],
+      'normal': ['3'],
+      'easy': ['2'],
+      'auto': ['1']
+    };
+
+    const stars = starRanges[difficulty];
+    if (stars && stars.length > 1) {
+      starRatingField.style.display = 'block';
+      starRatingSelect.innerHTML = '<option value="">Select stars</option>' + 
+        stars.map(s => `<option value="${s}">${s}★</option>`).join('');
+    } else {
+      starRatingField.style.display = 'none';
+    }
+  }
+
+  openModal(level = null) {
+    if (level) {
+      this.editingId = level.id;
+      document.querySelector('.modal-header h2').textContent = 'Edit Level';
+      document.getElementById('submitBtn').textContent = 'Save Changes';
+      
+      document.getElementById('levelName').value = level.name;
+      document.getElementById('levelCreator').value = level.creator;
+      document.getElementById('category').value = level.category;
+      this.updateDifficultyOptions();
+      document.getElementById('difficulty').value = level.difficulty;
+      this.updateStarRatingOptions();
+      document.getElementById('starRating').value = level.starRating || '';
+      document.getElementById('rating').value = level.rating || 'none';
+      document.getElementById('tags').value = level.tags ? level.tags.join(', ') : '';
+    } else {
+      this.editingId = null;
+      document.querySelector('.modal-header h2').textContent = 'Add New Level';
+      document.getElementById('submitBtn').textContent = 'Add Level';
+    }
+    
+    document.getElementById('modal').classList.add('active');
   }
 
   addLevel() {
@@ -106,25 +240,46 @@ class LevelManager {
     const category = document.getElementById('category').value;
     const difficulty = document.getElementById('difficulty').value;
     const rating = document.getElementById('rating').value;
+    const starRating = document.getElementById('starRating').value;
     const tagsInput = document.getElementById('tags').value;
     const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
 
-    const level = {
-      id: Date.now(),
-      name,
-      creator,
-      category,
-      difficulty,
-      rating,
-      tags
-    };
+    if (this.editingId) {
+      // Update existing level
+      const index = this.levels.findIndex(l => l.id === this.editingId);
+      if (index !== -1) {
+        this.levels[index] = {
+          ...this.levels[index],
+          name,
+          creator,
+          category,
+          difficulty,
+          rating,
+          starRating,
+          tags
+        };
+      }
+    } else {
+      // Add new level
+      const level = {
+        id: Date.now(),
+        name,
+        creator,
+        category,
+        difficulty,
+        rating,
+        starRating,
+        tags
+      };
+      this.levels.push(level);
+    }
 
-    this.levels.push(level);
     this.saveLevels();
     this.renderLevels();
     
     document.getElementById('modal').classList.remove('active');
     document.getElementById('levelForm').reset();
+    this.editingId = null;
     this.updateDifficultyOptions();
   }
 
@@ -262,6 +417,14 @@ class LevelManager {
           .map(level => this.createLevelElement(level))
           .join('');
         
+        container.querySelectorAll('.edit-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = parseInt(btn.dataset.id);
+            const level = this.levels.find(l => l.id === id);
+            if (level) this.openModal(level);
+          });
+        });
+
         container.querySelectorAll('.delete-btn').forEach(btn => {
           btn.addEventListener('click', () => {
             const id = parseInt(btn.dataset.id);
@@ -319,7 +482,14 @@ class LevelManager {
     };
     
     const diffType = level.category === 'demon' ? 'demon' : 'normal';
-    return labels[diffType][level.difficulty] || level.difficulty;
+    let label = labels[diffType][level.difficulty] || level.difficulty;
+    
+    // If a specific star rating is set, show it
+    if (level.starRating && level.category === 'rated') {
+      label = `${level.starRating}★`;
+    }
+    
+    return label;
   }
 
   createLevelElement(level) {
@@ -350,7 +520,10 @@ class LevelManager {
           </div>
           ${tagsHTML}
         </div>
-        <button class="delete-btn" data-id="${level.id}" title="Delete level">×</button>
+        <div class="level-actions">
+          <button class="edit-btn" data-id="${level.id}" title="Edit level">✎</button>
+          <button class="delete-btn" data-id="${level.id}" title="Delete level">×</button>
+        </div>
       </div>
     `;
   }
