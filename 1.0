@@ -1,0 +1,18 @@
+<div class="cards-container">
+  <div class="category-card" data-category="unrated">
+    <h2>Unrated</h2>
+    <div class="card-content" id="unratedContent"></div>
+  </div>
+  
+  <div class="category-card" data-category="rated">
+    <h2>Rated</h2>
+    <div class="card-content" id="ratedContent"></div>
+  </div>
+  
+  <div class="category-card" data-category="demon">
+    <h2>Demons</h2>
+    <div class="card-content" id="demonContent"></div>
+  </div>
+</div>
+
+<button id="addBtn" class="fab">+</button>

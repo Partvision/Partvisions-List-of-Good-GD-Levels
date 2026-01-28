@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Partvisions GD Levels</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg-gradient"></div>
+  <div class="container">
+    <header>
+      <div class="header-content">
+        <div class="title-section">
+          <h1>Partvisions<span> List of Good GD Levels</span></h1>
+        </div>
+        <div class="search-section">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="searchBar" placeholder="Search levels, creators, tags...">
+        </div>
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label class="filter-label">Difficulty</label>
+            <select id="difficultyFilter" class="filter-select">
+              <option value="all">All Difficulties</option>
+              <optgroup label="Demons">
+                <option value="extreme">Extreme Demon</option>
+                <option value="insane-demon">Insane Demon</option>
+                <option value="hard-demon">Hard Demon</option>
+                <option value="medium-demon">Medium Demon</option>
+                <option value="easy-demon">Easy Demon</option>
+              </optgroup>
+              <optgroup label="Rated">
+                <option value="insane">Insane (8*-9*)</option>
+                <option value="harder">Harder (6*-7*)</option>
+                <option value="hard">Hard (4*-5*)</option>
+                <option value="normal">Normal (3*)</option>
+                <option value="easy">Easy (2*)</option>
+                <option value="auto">Auto (1*)</option>
+              </optgroup>
+              <option value="unrated">Unrated</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Sort By</label>
+            <select id="sortFilter" class="filter-select">
+              <option value="recent">Recently Added</option>
+              <option value="name">Name (A-Z)</option>
+              <option value="creator">Creator (A-Z)</option>
+            </select>
+          </div>
+          <button id="clearFilters" class="clear-filters-btn">Clear Filters</button>
+        </div>
+        <div id="activeFilters" class="active-filters"></div>
+      </div>
+    </header>
+
+    <div class="cards-container">
+      <div class="category-card" data-category="unrated">
+        <div class="category-header">
+          <div class="category-dot unrated"></div>
+          <h2>Unrated</h2>
+        </div>
+        <div class="card-content" id="unratedContent"></div>
+      </div>
+      
+      <div class="category-card" data-category="rated">
+        <div class="category-header">
+          <div class="category-dot rated"></div>
+          <h2>Rated</h2>
+        </div>
+        <div class="card-content" id="ratedContent"></div>
+      </div>
+      
+      <div class="category-card" data-category="demon">
+        <div class="category-header">
+          <div class="category-dot demon"></div>
+          <h2>Demons</h2>
+        </div>
+        <div class="card-content" id="demonContent"></div>
+      </div>
+    </div>
+
+    <button id="addBtn" class="fab">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    </button>
+  </div>
+
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add New Level</h2>
+        <button type="button" id="closeModal" class="close-btn">×</button>
+      </div>
+      <form id="levelForm">
+        <div class="input-group">
+          <label>Level Name</label>
+          <input type="text" id="levelName" placeholder="e.g. Bloodbath" required>
+        </div>
+        
+        <div class="input-group">
+          <label>Creator</label>
+          <input type="text" id="levelCreator" placeholder="e.g. Riot" required>
+        </div>
+        
+        <div class="form-row">
+          <div class="input-group">
+            <label>Category</label>
+            <select id="category" required>
+              <option value="rated">Rated</option>
+              <option value="unrated">Unrated</option>
+              <option value="demon">Demon</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label>Difficulty</label>
+            <select id="difficulty" required></select>
+          </div>
+        </div>
+
+        <div id="ratingField" class="input-group">
+          <label>Decoration Rating</label>
+          <select id="rating">
+            <option value="none">Standard</option>
+            <option value="featured">Featured</option>
+            <option value="legendary">Legendary</option>
+            <option value="mythic">Mythic</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Tags</label>
+          <input type="text" id="tags" placeholder="Space, bossfight, colorful...">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="cancelBtn" class="btn-secondary">Discard</button>
+          <button type="submit" class="btn-primary">Add Level</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
